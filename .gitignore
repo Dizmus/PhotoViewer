@@ -1,0 +1,6 @@
+PhotoViewer.Domain/obj/*
+PhotoViewer.Layout/bin/*
+PhotoViewer.Layout/obj/*
+PhotoViewer/bin/*
+PhotoViewer/obj/*
+packages/*
