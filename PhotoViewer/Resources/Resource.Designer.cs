@@ -26,6 +26,8 @@ namespace PhotoViewer
 		
 		public static void UpdateIdValues()
 		{
+			global::SQLite.Net.Platform.XamarinAndroid.Resource.String.ApplicationName = global::PhotoViewer.Resource.String.ApplicationName;
+			global::SQLite.Net.Platform.XamarinAndroid.Resource.String.Hello = global::PhotoViewer.Resource.String.Hello;
 		}
 		
 		public partial class Attribute
@@ -60,46 +62,14 @@ namespace PhotoViewer
 			}
 		}
 		
-		public partial class Id
-		{
-			
-			// aapt resource value: 0x7f060000
-			public const int MyButton = 2131099648;
-			
-			static Id()
-			{
-				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
-			}
-			
-			private Id()
-			{
-			}
-		}
-		
-		public partial class Layout
-		{
-			
-			// aapt resource value: 0x7f030000
-			public const int Main = 2130903040;
-			
-			static Layout()
-			{
-				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
-			}
-			
-			private Layout()
-			{
-			}
-		}
-		
 		public partial class String
 		{
 			
-			// aapt resource value: 0x7f040001
-			public const int ApplicationName = 2130968577;
+			// aapt resource value: 0x7f030001
+			public const int ApplicationName = 2130903041;
 			
-			// aapt resource value: 0x7f040000
-			public const int Hello = 2130968576;
+			// aapt resource value: 0x7f030000
+			public const int Hello = 2130903040;
 			
 			static String()
 			{
@@ -114,8 +84,8 @@ namespace PhotoViewer
 		public partial class Style
 		{
 			
-			// aapt resource value: 0x7f050000
-			public const int Mono_Android_Theme_Splash = 2131034112;
+			// aapt resource value: 0x7f040000
+			public const int Mono_Android_Theme_Splash = 2130968576;
 			
 			static Style()
 			{

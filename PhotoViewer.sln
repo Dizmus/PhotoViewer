@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoViewer.Layout", "Photo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoViewer.Domain", "PhotoViewer.Domain\PhotoViewer.Domain.csproj", "{F2A01351-8CBA-4274-8DFF-A387637DB672}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoViewer.DAO", "PhotoViewer.DAO\PhotoViewer.DAO.csproj", "{3EE0823A-D1B1-42BC-AF7A-7A630388DEBB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{F2A01351-8CBA-4274-8DFF-A387637DB672}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2A01351-8CBA-4274-8DFF-A387637DB672}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2A01351-8CBA-4274-8DFF-A387637DB672}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EE0823A-D1B1-42BC-AF7A-7A630388DEBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EE0823A-D1B1-42BC-AF7A-7A630388DEBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EE0823A-D1B1-42BC-AF7A-7A630388DEBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EE0823A-D1B1-42BC-AF7A-7A630388DEBB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
