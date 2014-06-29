@@ -1,8 +1,8 @@
-﻿using System;
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
 
-namespace PhotoViewer.Layout.ViewModels {
+namespace PhotoViewer.Layout.ViewModels.DomainModels {
     public class PictureModel {
+        public int Id { get; set; }
         public ImageSource ImageSource { get; set; }
 
         public string CommentsCount { get; set; }

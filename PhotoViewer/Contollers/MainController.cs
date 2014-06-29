@@ -12,6 +12,7 @@ using Java.Net;
 using PhotoViewer.DAO;
 using PhotoViewer.Layout;
 using PhotoViewer.Layout.ViewModels;
+using PhotoViewer.Layout.ViewModels.DomainModels;
 using TinyIoC;
 using Xamarin.Forms;
 using File = Java.IO.File;
@@ -49,7 +50,8 @@ namespace PhotoViewer.Contollers {
             IList<PictureModel> pictureModels = enumerable.Select(picture => new PictureModel() {
                 CommentsCount = (picture.Comments != null ? picture.Comments.Count() : 0).ToString(CultureInfo.InvariantCulture),
                 ImageSource = ImageSource.FromFile(picture.ThumbnailImagePath),
-                ImageDate = picture.DateAdded.ToString(CultureInfo.InvariantCulture)
+                ImageDate = picture.DateAdded.ToString(CultureInfo.InvariantCulture),
+                Id =  picture.Id
             }).ToList();
 
            
@@ -84,7 +86,8 @@ namespace PhotoViewer.Contollers {
             PictureModel model = new PictureModel {
                 ImageSource = imageSource,
                 CommentsCount = "0",
-                ImageDate = dateAdded.ToString(CultureInfo.InvariantCulture)
+                ImageDate = dateAdded.ToString(CultureInfo.InvariantCulture),
+                Id =  picture.Id
             };
             mainScreenViewModel.AddNewPicture(model);
         }

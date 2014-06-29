@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PhotoViewer.Layout.ViewModels;
+using PhotoViewer.Layout.ViewModels.DomainModels;
 using Xamarin.Forms;
 
 namespace PhotoViewer.Layout {
-    public class MainScreen : ContentPage {
-        public MainScreen() {
+    public class MainView : ContentPage {
+        public MainView() {
             Grid contentGrid = new Grid() {
                 VerticalOptions = LayoutOptions.FillAndExpand,
                 RowDefinitions = new RowDefinitionCollection() {

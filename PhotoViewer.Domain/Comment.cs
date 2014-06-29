@@ -1,4 +1,5 @@
-﻿using SQLite.Net.Attributes;
+﻿using System;
+using SQLite.Net.Attributes;
 
 namespace PhotoViewer.Domain {
     [Table("Comments")]
@@ -7,5 +8,7 @@ namespace PhotoViewer.Domain {
         public int Id { get; set; }
 
         public string Text { get; set; }
+
+        public DateTime PostDate { get; set; }
     }
 }

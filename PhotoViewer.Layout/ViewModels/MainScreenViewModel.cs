@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using PhotoViewer.Domain;
 using PhotoViewer.Layout.Annotations;
+using PhotoViewer.Layout.ViewModels.DomainModels;
 using Xamarin.Forms;
 
 namespace PhotoViewer.Layout.ViewModels {
@@ -53,7 +54,7 @@ namespace PhotoViewer.Layout.ViewModels {
         }
 
         public NavigationPage GetView() {
-            return view ?? (view = new NavigationPage(new MainScreen() { BindingContext = this }) {
+            return view ?? (view = new NavigationPage(new MainView() { BindingContext = this }) {
                 Title = "Photo Viewer"
             });
         }
@@ -71,6 +72,10 @@ namespace PhotoViewer.Layout.ViewModels {
         void MainScreenViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e) {
             if (e.PropertyName == "SelectedPicture") {
                 if (SelectedPicture != null) {
+                    ViewImageViewModel viewImageViewModel = new ViewImageViewModel();
+                    viewImageViewModel.LoadComments(SelectedPicture.Id);
+
+                    view.Navigation.PushAsync(viewImageViewModel.GetView());
                 }
             }
         }

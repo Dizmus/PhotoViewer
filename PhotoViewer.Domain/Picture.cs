@@ -13,7 +13,7 @@ namespace PhotoViewer.Domain {
         public int Id { get; set; }
 
         [OneToMany]
-        public IEnumerable<Comment> Comments { get; set; }
+        public IList<Comment> Comments { get; set; }
 
         public string OriginalImagePath { get; set; }
        
