@@ -5,11 +5,15 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using PhotoViewer.Domain;
 using PhotoViewer.Layout.Annotations;
+using Xamarin.Forms;
 
 namespace PhotoViewer.Layout.ViewModels {
     public class MainScreenViewModel : INotifyPropertyChanged {
         private ObservableCollection<PictureModel> pictures;
         private string mainText;
+        private PictureModel selectedPicture;
+
+        private NavigationPage view;
 
         public MainScreenViewModel() {
             PropertyChanged += MainScreenViewModel_PropertyChanged;
@@ -39,6 +43,21 @@ namespace PhotoViewer.Layout.ViewModels {
             }
         }
 
+        public PictureModel SelectedPicture {
+            get { return selectedPicture; }
+            set {
+                if (Equals(value, selectedPicture)) return;
+                selectedPicture = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public NavigationPage GetView() {
+            return view ?? (view = new NavigationPage(new MainScreen() { BindingContext = this }) {
+                Title = "Photo Viewer"
+            });
+        }
+
         public void AddNewPicture(PictureModel picture) {
             Pictures.Add(picture);
 
@@ -50,8 +69,9 @@ namespace PhotoViewer.Layout.ViewModels {
         public event PropertyChangedEventHandler PropertyChanged;
 
         void MainScreenViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e) {
-            if (e.PropertyName == "Pictures") {
-               
+            if (e.PropertyName == "SelectedPicture") {
+                if (SelectedPicture != null) {
+                }
             }
         }
 

@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Android.Graphics;
 using Android.Provider;
@@ -39,9 +43,19 @@ namespace PhotoViewer.Contollers {
         public Page LoadMainPage() {
             mainScreenViewModel = new MainScreenViewModel { AddPictureCommand = new Command(OnAddNewPictureCommand) };
 
-            ContentPage mainScreen = new MainScreen();
-            mainScreen.BindingContext = mainScreenViewModel;
-            return mainScreen;
+            PictureRepository repository = GetPictureRepository();
+            IList<Picture> enumerable = repository.GetAll().ToList();
+
+            IList<PictureModel> pictureModels = enumerable.Select(picture => new PictureModel() {
+                CommentsCount = (picture.Comments != null ? picture.Comments.Count() : 0).ToString(CultureInfo.InvariantCulture),
+                ImageSource = ImageSource.FromFile(picture.ThumbnailImagePath),
+                ImageDate = picture.DateAdded.ToString(CultureInfo.InvariantCulture)
+            }).ToList();
+
+           
+            mainScreenViewModel.Pictures = new ObservableCollection<PictureModel>(pictureModels);
+
+            return mainScreenViewModel.GetView();
         }
 
         private PictureRepository GetPictureRepository() {
@@ -57,13 +71,21 @@ namespace PhotoViewer.Contollers {
 
             string thumbnailPath = SaveThumbnailForImage(path);
 
+            FileInfo info = new FileInfo(path);
+            DateTime dateAdded = info.CreationTime;
+            
             Picture picture = new Picture();
             picture.OriginalImagePath = path;
             picture.ThumbnailImagePath = thumbnailPath;
+            picture.DateAdded = dateAdded;
             repository.Insert(picture);
 
             ImageSource imageSource = ImageSource.FromFile(thumbnailPath);
-            PictureModel model = new PictureModel { ImageSource = imageSource };
+            PictureModel model = new PictureModel {
+                ImageSource = imageSource,
+                CommentsCount = "0",
+                ImageDate = dateAdded.ToString(CultureInfo.InvariantCulture)
+            };
             mainScreenViewModel.AddNewPicture(model);
         }
 
@@ -112,7 +134,7 @@ namespace PhotoViewer.Contollers {
                 return null;
             }
 
-            Bitmap loadImageFromUrl = Bitmap.CreateScaledBitmap(bm, 100, 100, true);
+            Bitmap loadImageFromUrl = Bitmap.CreateScaledBitmap(bm, 200, 200, true);
             bm.Dispose();
             return loadImageFromUrl;
         }

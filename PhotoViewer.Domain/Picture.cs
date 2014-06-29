@@ -18,5 +18,6 @@ namespace PhotoViewer.Domain {
         public string OriginalImagePath { get; set; }
        
         public string ThumbnailImagePath { get; set; }
+        public DateTime DateAdded { get; set; }
     }
 }

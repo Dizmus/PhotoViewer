@@ -6,9 +6,6 @@ using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace PhotoViewer.Layout {
-    public partial class MainScreen : ContentPage {
-        public MainScreen() {
-            InitializeComponent();
-        }
+    public class ViewImagePage : NavigationPage {
     }
 }
