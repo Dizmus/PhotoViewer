@@ -1,5 +1,6 @@
 ﻿using System;
 using SQLite.Net.Attributes;
+using SQLiteNetExtensions.Attributes;
 
 namespace PhotoViewer.Domain {
     [Table("Comments")]
@@ -10,5 +11,11 @@ namespace PhotoViewer.Domain {
         public string Text { get; set; }
 
         public DateTime PostDate { get; set; }
+
+        [ForeignKey(typeof(Picture))]
+        public int PictureId { get; set; }
+
+        [ManyToOne()]
+        public Picture Picture { get; set; }
     }
 }

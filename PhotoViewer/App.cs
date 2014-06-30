@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Runtime.Remoting.Messaging;
 using Android.App;
 using Android.Runtime;
 using PhotoViewer.Contollers;
@@ -24,14 +25,17 @@ namespace PhotoViewer {
         }
 
         private static void SetupIoc() {
-            PictureRepository.SQLitePlatform = new SQLitePlatformAndroid();
-            PictureRepository.DbPath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.Personal),
-        "photoviewer.db3");
+            SQLitePlatformAndroid sqLitePlatformAndroid = new SQLitePlatformAndroid();
+            string path = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.Personal),
+                "photoviewer.db3");
 
+            PictureRepository pictureRepository = new PictureRepository(sqLitePlatformAndroid, path);
+            CommentRepository commentRepository = new CommentRepository(sqLitePlatformAndroid, path);
+
+            TinyIoCContainer.Current.Register(pictureRepository);
+            TinyIoCContainer.Current.Register(commentRepository);
             TinyIoCContainer.Current.Register<MainController>();
-            TinyIoCContainer.Current.Register<PictureRepository>();
-            TinyIoCContainer.Current.Register<CommentRepository>();
-        }
+          }
     }
 }

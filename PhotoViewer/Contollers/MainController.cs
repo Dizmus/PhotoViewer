@@ -33,7 +33,9 @@ namespace PhotoViewer.Contollers {
         private MainScreenViewModel mainScreenViewModel;
         private string thumbnailsLocation;
 
-        public MainController() {
+        public MainController(PictureRepository repository, CommentRepository commentRepository) {
+            pictureRepository = repository;
+            this.commentRepository = commentRepository;
             thumbnailsLocation = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 "thumbs");
             if (!Directory.Exists(thumbnailsLocation)) {
@@ -42,62 +44,18 @@ namespace PhotoViewer.Contollers {
         }
 
         public Page LoadMainPage() {
-            mainScreenViewModel = new MainScreenViewModel { AddPictureCommand = new Command(OnAddNewPictureCommand) };
-
-            PictureRepository repository = GetPictureRepository();
-            IList<Picture> enumerable = repository.GetAll().ToList();
-
-            IList<PictureModel> pictureModels = enumerable.Select(picture => new PictureModel() {
-                CommentsCount = (picture.Comments != null ? picture.Comments.Count() : 0).ToString(CultureInfo.InvariantCulture),
-                ImageSource = ImageSource.FromFile(picture.ThumbnailImagePath),
-                ImageDate = picture.DateAdded.ToString(CultureInfo.InvariantCulture),
-                Id =  picture.Id
-            }).ToList();
-
-           
-            mainScreenViewModel.Pictures = new ObservableCollection<PictureModel>(pictureModels);
+            mainScreenViewModel = new MainScreenViewModel(pictureRepository, commentRepository) { AddPictureCommand = new Command(OnAddNewPictureCommand) };
 
             return mainScreenViewModel.GetView();
         }
 
-        private PictureRepository GetPictureRepository() {
-            if (pictureRepository == null) {
-                pictureRepository = TinyIoCContainer.Current.Resolve<PictureRepository>();
-            }
-
-            return pictureRepository;
-        }
-
         public void AddNewPictureToGalery(string path) {
-            PictureRepository repository = GetPictureRepository();
-
             string thumbnailPath = SaveThumbnailForImage(path);
 
             FileInfo info = new FileInfo(path);
             DateTime dateAdded = info.CreationTime;
-            
-            Picture picture = new Picture();
-            picture.OriginalImagePath = path;
-            picture.ThumbnailImagePath = thumbnailPath;
-            picture.DateAdded = dateAdded;
-            repository.Insert(picture);
 
-            ImageSource imageSource = ImageSource.FromFile(thumbnailPath);
-            PictureModel model = new PictureModel {
-                ImageSource = imageSource,
-                CommentsCount = "0",
-                ImageDate = dateAdded.ToString(CultureInfo.InvariantCulture),
-                Id =  picture.Id
-            };
-            mainScreenViewModel.AddNewPicture(model);
-        }
-
-        private CommentRepository GetCommentRepository() {
-            if (commentRepository == null) {
-                commentRepository = TinyIoCContainer.Current.Resolve<CommentRepository>();
-            }
-
-            return commentRepository;
+            mainScreenViewModel.AddNewPicture(path, thumbnailPath, dateAdded);
         }
 
         private void OnAddNewPictureCommand() {

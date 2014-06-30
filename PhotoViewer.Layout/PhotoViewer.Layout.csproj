@@ -35,7 +35,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="MainView.cs" />
-    <Compile Include="TinyIoC.cs" />
     <Compile Include="ViewImageView.cs" />
     <Compile Include="ViewModels\DomainModels\CommentModel.cs" />
     <Compile Include="ViewModels\MainScreenViewModel.cs" />

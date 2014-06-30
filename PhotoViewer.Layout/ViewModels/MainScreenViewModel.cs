@@ -1,8 +1,12 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using PhotoViewer.DAO;
 using PhotoViewer.Domain;
 using PhotoViewer.Layout.Annotations;
 using PhotoViewer.Layout.ViewModels.DomainModels;
@@ -10,14 +14,14 @@ using Xamarin.Forms;
 
 namespace PhotoViewer.Layout.ViewModels {
     public class MainScreenViewModel : INotifyPropertyChanged {
+        private readonly PictureRepository pictureRepository;
+        private readonly CommentRepository commentRepository;
         private ObservableCollection<PictureModel> pictures;
-        private string mainText;
-        private PictureModel selectedPicture;
-
         private NavigationPage view;
 
-        public MainScreenViewModel() {
-            PropertyChanged += MainScreenViewModel_PropertyChanged;
+        public MainScreenViewModel(PictureRepository pictureRepository, CommentRepository commentRepository) {
+            this.pictureRepository = pictureRepository;
+            this.commentRepository = commentRepository;
             pictures = new ObservableCollection<PictureModel>();
         }
 
@@ -44,41 +48,75 @@ namespace PhotoViewer.Layout.ViewModels {
             }
         }
 
-        public PictureModel SelectedPicture {
-            get { return selectedPicture; }
-            set {
-                if (Equals(value, selectedPicture)) return;
-                selectedPicture = value;
-                OnPropertyChanged();
-            }
-        }
-
         public NavigationPage GetView() {
-            return view ?? (view = new NavigationPage(new MainView() { BindingContext = this }) {
+            NavigationPage navigationPage = view ?? (view = new NavigationPage(new MainView(this)) {
                 Title = "Photo Viewer"
             });
+
+            navigationPage.Pushed += navigationPage_Pushed;
+            navigationPage.PoppedToRoot += navigationPage_PoppedToRoot;
+
+            return navigationPage;
         }
 
-        public void AddNewPicture(PictureModel picture) {
-            Pictures.Add(picture);
+        void navigationPage_PoppedToRoot(object sender, NavigationEventArgs e) {
+            int p = 0;
+        }
+
+        void navigationPage_Pushed(object sender, NavigationEventArgs e) {
+            int p = 0;
+        }
+
+        public void Prepare() {
+            PictureRepository repository = pictureRepository;
+            IList<Picture> enumerable = repository.GetAllWithChildren().ToList();
+
+            IList<PictureModel> pictureModels = enumerable.Select(picture => new PictureModel() {
+                CommentsCount = (picture.Comments != null ? picture.Comments.Count() : 0).ToString(CultureInfo.InvariantCulture),
+                ImageSource = ImageSource.FromFile(picture.ThumbnailImagePath),
+                ImageDate = picture.DateAdded.ToString(CultureInfo.InvariantCulture),
+                Id = picture.Id
+            }).ToList();
+
+            Pictures = new ObservableCollection<PictureModel>(pictureModels);
+
+            OnPropertyChanged("AnyPictureExists");
+            OnPropertyChanged("NoPictureExists");
+        }
+
+        public void AddNewPicture(string originalPath, string thumbnailPath, DateTime dateAdded) {
+            Picture picture = new Picture {
+                OriginalImagePath = originalPath,
+                ThumbnailImagePath = thumbnailPath,
+                DateAdded = dateAdded
+            };
+
+
+            pictureRepository.Insert(picture);
+
+            ImageSource imageSource = ImageSource.FromFile(thumbnailPath);
+            PictureModel model = new PictureModel {
+                ImageSource = imageSource,
+                CommentsCount = "0",
+                ImageDate = dateAdded.ToString(CultureInfo.InvariantCulture),
+                Id = picture.Id
+            };
+
+            Pictures.Add(model);
 
             OnPropertyChanged("Pictures");
             OnPropertyChanged("AnyPictureExists");
             OnPropertyChanged("NoPictureExists");
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public void ListViewItemTapped(PictureModel pictureModel) {
+            ViewImageViewModel viewImageViewModel = new ViewImageViewModel(pictureRepository, commentRepository);
+            viewImageViewModel.Prepare(pictureModel.Id);
 
-        void MainScreenViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e) {
-            if (e.PropertyName == "SelectedPicture") {
-                if (SelectedPicture != null) {
-                    ViewImageViewModel viewImageViewModel = new ViewImageViewModel();
-                    viewImageViewModel.LoadComments(SelectedPicture.Id);
-
-                    view.Navigation.PushAsync(viewImageViewModel.GetView());
-                }
-            }
+            view.PushAsync(viewImageViewModel.GetView());
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {

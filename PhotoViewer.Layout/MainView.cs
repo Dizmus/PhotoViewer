@@ -9,7 +9,16 @@ using Xamarin.Forms;
 
 namespace PhotoViewer.Layout {
     public class MainView : ContentPage {
-        public MainView() {
+        private MainScreenViewModel dataContext;
+
+        protected override void OnAppearing() {
+            base.OnAppearing();
+            dataContext.Prepare();
+        }
+
+        public MainView(MainScreenViewModel dataContext) {
+            this.BindingContext = this.dataContext = dataContext;
+
             Grid contentGrid = new Grid() {
                 VerticalOptions = LayoutOptions.FillAndExpand,
                 RowDefinitions = new RowDefinitionCollection() {
@@ -54,7 +63,7 @@ namespace PhotoViewer.Layout {
             };
 
             listView.SetBinding<MainScreenViewModel>(ListView.ItemsSourceProperty, m => m.Pictures);
-            listView.SetBinding<MainScreenViewModel>(ListView.SelectedItemProperty, m => m.SelectedPicture);
+            listView.ItemTapped += ListViewOnItemTapped;
 
             stackLayoutImages.Children.Add(listView);
 
@@ -108,6 +117,17 @@ namespace PhotoViewer.Layout {
             return new ViewCell {
                 View = grid,
             };
+        }
+
+        private void ListViewOnItemTapped(object sender, ItemTappedEventArgs itemTappedEventArgs) {
+            if (itemTappedEventArgs.Item != null) {
+                PictureModel pictureModel = itemTappedEventArgs.Item as PictureModel;
+                if (pictureModel != null) {
+                    dataContext.ListViewItemTapped(pictureModel);
+                    ListView listView = sender as ListView;
+                    if (listView != null) listView.SelectedItem = null;
+                }
+            }
         }
     }
 }

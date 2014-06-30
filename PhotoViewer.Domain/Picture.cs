@@ -9,11 +9,20 @@ using SQLiteNetExtensions.Attributes;
 namespace PhotoViewer.Domain {
     [Table("Pictures")]
     public class Picture : IEntity<int> {
+        private List<Comment> comments;
+
+        public Picture() {
+            comments = new List<Comment>();
+        }
+
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
 
         [OneToMany]
-        public IList<Comment> Comments { get; set; }
+        public List<Comment> Comments {
+            get { return comments; }
+            set { comments = value; }
+        }
 
         public string OriginalImagePath { get; set; }
        

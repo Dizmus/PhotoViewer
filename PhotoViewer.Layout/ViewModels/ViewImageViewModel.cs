@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using PhotoViewer.DAO;
 using PhotoViewer.Domain;
 using PhotoViewer.Layout.Annotations;
 using PhotoViewer.Layout.ViewModels.DomainModels;
-using TinyIoC;
 using Xamarin.Forms;
 
 namespace PhotoViewer.Layout.ViewModels {
@@ -19,29 +19,43 @@ namespace PhotoViewer.Layout.ViewModels {
         private CommentRepository commentRepository;
         private Picture currentPicture;
         private Page view;
+        private string newCommentText;
 
-        public ViewImageViewModel() {
-            pictureRepository = TinyIoCContainer.Current.Resolve<PictureRepository>();
-            commentRepository = TinyIoCContainer.Current.Resolve<CommentRepository>();
+        public ViewImageViewModel(PictureRepository repository, CommentRepository commentRepository) {
+            this.pictureRepository = repository;
+            this.commentRepository = commentRepository;
 
             AddCommentCommand = new Command(onAddCommentCommand);
         }
 
         public ImageSource ImageSource { get; set; }
 
-        public string NewCommentText { get; set; }
+        public string NewCommentText {
+            get { return newCommentText; }
+            set {
+                if (value == newCommentText) return;
+                newCommentText = value;
+                OnPropertyChanged();
+            }
+        }
 
         public ICommand AddCommentCommand { get; set; }
 
         public ObservableCollection<CommentModel> Comments { get; set; }
 
+        public bool NoPictureExists {
+            get {
+                return Comments == null || !Comments.Any();
+            }
+        }
+
         public Page GetView() {
-            return view ?? (view = new NavigationPage(new ViewImageView() { BindingContext = this }) {
+            return view ?? (view = new NavigationPage(new ViewImageView(this)) {
                 Title = "Photo Details"
             });
         }
 
-        public void LoadComments(int pictureId) {
+        public void Prepare(int pictureId) {
             currentPicture = pictureRepository.GetById(pictureId);
 
             IList<CommentModel> commentModels = new List<CommentModel>();
@@ -54,22 +68,31 @@ namespace PhotoViewer.Layout.ViewModels {
             }
 
             Comments = new ObservableCollection<CommentModel>(commentModels);
+
+            ImageSource = ImageSource.FromFile(currentPicture.OriginalImagePath);
         }
 
         private void onAddCommentCommand() {
             Comment comment = new Comment() {
                 Text = NewCommentText,
-                PostDate = DateTime.Now
+                PostDate = DateTime.Now,
+                Picture = currentPicture,
+                PictureId = currentPicture.Id
             };
 
             currentPicture.Comments.Add(comment);
-            pictureRepository.Update(currentPicture);
-            Comments.Add(new CommentModel() {
+
+            commentRepository.Insert(comment);
+
+            CommentModel commentModel = new CommentModel() {
                 CommentDate = comment.PostDate.ToString(DateTimeFormatInfo.InvariantInfo),
                 CommentText = comment.Text
-            });
+            };
+            Comments.Add(commentModel);
 
             OnPropertyChanged("Comments");
+            OnPropertyChanged("NoPictureExists");
+            NewCommentText = string.Empty;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
